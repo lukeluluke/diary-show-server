@@ -10,6 +10,7 @@ namespace App\Core\Entities;
 
 use App\Core\Traits\EntityBaseTrait;
 use Doctrine\ORM\Mapping AS ORM;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 /**
  * @ORM\Entity
@@ -17,15 +18,16 @@ use Doctrine\ORM\Mapping AS ORM;
  * Class User
  * @package App\Core\Entities
  */
-class User
+class User implements Authenticatable
 {
     use EntityBaseTrait;
+    use \LaravelDoctrine\ORM\Auth\Authenticatable;
 
     /**
      * @var $username
-     * @ORM\Column(type="string")
+     * @ORM\Column(name="username",type="string")
      */
-    private $username;
+    protected $username;
 
     /**
      * @var $firstName
@@ -39,17 +41,24 @@ class User
      */
     private $lastName;
 
-    /**
-     * @var $password
-     * @ORM\Column(name="password", type="string")
-     */
-    private $password;
 
     /**
      * @var $apiKey;
      * @ORM\Column(name="api_key", type="string")
      */
     private $apiKey;
+
+    /**
+     * @var \DateTime $dob
+     * @ORM\Column(name="dob", type="datetime")
+     */
+    private $dob;
+
+    /**
+     * @var $gender
+     * @ORM\Column(name="gender", type="smallint")
+     */
+    private $gender;
 
     /**
      * @var $email
@@ -69,4 +78,12 @@ class User
      */
     private $lastLoginAt;
 
+    /**
+     * Overwrite doctrine authentication identifier
+     * @return string
+     */
+    public function getAuthIdentifierName()
+    {
+        return 'username';
+    }
 }
