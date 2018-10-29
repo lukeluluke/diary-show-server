@@ -49,7 +49,7 @@ class RegisterController extends Controller
             'firstName' => 'required|string|max:255',
             'lastName' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:App\Core\Entities\User,username',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8',
         ];
         return $this->validate($request, $rules);
     }
