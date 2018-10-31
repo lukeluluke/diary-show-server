@@ -9,7 +9,8 @@
 namespace App\Core\Traits;
 
 use Doctrine\ORM\Mapping as ORM;
-use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\Uuid as UuidGenerator;
+use Ramsey\Uuid\UuidInterface;
 
 trait EntityBaseTrait
 {
@@ -82,9 +83,19 @@ trait EntityBaseTrait
         return $this->uuid;
     }
 
-    public function setUuid(Uuid $uuid)
+    /**
+     * @param UuidInterface|string $uuid
+     * @return $this
+     */
+    public function setUuid($uuid)
     {
-        $this->uuid = $uuid;
+        if (is_string($uuid))
+        {
+            $this->uuid = UuidGenerator::fromString($uuid);
+        } elseif ($uuid instanceof UuidInterface)
+        {
+            $this->uuid = $uuid;
+        }
         return $this;
     }
 
@@ -203,5 +214,42 @@ trait EntityBaseTrait
     public function setArchived($archived) {
         $this->archived = $archived;
         return $this;
+    }
+
+    public function initialiseUuid()
+    {
+        if (!isset($this->uuid))
+        {
+            $this->setUuid(UuidGenerator::uuid4());
+        }
+        return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function stampCreated()
+    {
+        try{
+            $this->setCreatedAt(new \DateTime());
+            $this->setUpdatedAt(new \DateTime());
+            $this->setCreatedBy(-1);
+            $this->setModifiedBy(-1);
+            $this->initialiseUuid(UuidGenerator::uuid4());
+            $this->setDeleted(0);
+            $this->setArchived(0);
+        } catch (\Exception $e)
+        {
+            $message = 'Unable to stamp created';
+        }
+
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function stampUpdated()
+    {
+        $this->setUpdatedAt(new \DateTime());
     }
 }

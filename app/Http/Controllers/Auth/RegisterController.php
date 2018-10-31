@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Core\Entities\User;
 use App\Http\Controllers\Controller;
+use Doctrine\ORM\EntityManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -28,13 +30,18 @@ class RegisterController extends Controller
     protected $redirectTo = '/home';
 
     /**
-     * Create a new controller instance.
-     *
-     * @return void
+     * @var EntityManager
      */
-    public function __construct()
+    private $entityManager = null;
+
+    /**
+     * RegisterController constructor.
+     * @param EntityManager $entityManager
+     */
+    public function __construct(EntityManager $entityManager)
     {
         $this->middleware('guest');
+        $this->entityManager = $entityManager;
     }
 
 
@@ -49,6 +56,7 @@ class RegisterController extends Controller
             'firstName' => 'required|string|max:255',
             'lastName' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:App\Core\Entities\User,username',
+            'email' => 'required|email|unique:App\Core\Entities\User,email',
             'password' => 'required|string|min:8',
         ];
         return $this->validate($request, $rules);
@@ -57,10 +65,22 @@ class RegisterController extends Controller
 
 
     public function register(Request $request) {
-       if($this->validateUser($request)) {
-           return 'Success';
-       } else {
-           return 'Invalid';
-       }
+        try {
+            $this->validateUser($request);
+            $user = new User();
+            $user->setUsername($request->json('username'));
+            $user->setPassword($request->json('password'));
+            $user->setFirstName($request->json('firstName'));
+            $user->setLastName($request->json('lastName'));
+            $user->setEmail($request->json('email'));
+            $user->setApiKey('123');
+            $user->setType(1);
+            $this->entityManager->persist($user);
+            $this->entityManager->flush();
+            return 'Success';
+        } catch (\Exception $e)
+        {
+            return 'Invalid';
+        }
     }
 }

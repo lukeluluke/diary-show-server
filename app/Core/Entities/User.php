@@ -11,10 +11,12 @@ namespace App\Core\Entities;
 use App\Core\Traits\EntityBaseTrait;
 use Doctrine\ORM\Mapping AS ORM;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Ramsey\Uuid\Uuid;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="ds_core_user")
+ * @ORM\HasLifecycleCallbacks
  * Class User
  * @package App\Core\Entities
  */
@@ -50,13 +52,13 @@ class User implements Authenticatable
 
     /**
      * @var \DateTime $dob
-     * @ORM\Column(name="dob", type="datetime")
+     * @ORM\Column(name="dob", type="datetime", nullable=true)
      */
     private $dob;
 
     /**
      * @var $gender
-     * @ORM\Column(name="gender", type="smallint")
+     * @ORM\Column(name="gender", type="smallint", nullable=true)
      */
     private $gender;
 
@@ -74,7 +76,7 @@ class User implements Authenticatable
 
     /**
      * @var \DateTime $lastLoginAt
-     * @ORM\Column(name="last_login_at", type="datetime")
+     * @ORM\Column(name="last_login_at", type="datetime", nullable=true)
      */
     private $lastLoginAt;
 
@@ -85,5 +87,71 @@ class User implements Authenticatable
     public function getAuthIdentifierName()
     {
         return 'username';
+    }
+
+    public function setUsername($username)
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    public function setEmail($email)
+    {
+        $this->email = $email;
+        return $this;
+    }
+
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    public function setFirstName($firstName)
+    {
+        $this->firstName = $firstName;
+        return $this;
+    }
+
+    public function getFirstName()
+    {
+        return $this->firstName;
+    }
+
+    public function setLastName($lastName)
+    {
+        $this->lastName = $lastName;
+        return $this;
+    }
+
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
+
+    public function setApiKey($apiKey)
+    {
+        $this->apiKey = $apiKey;
+        return $this;
+    }
+
+    public function getApiKey()
+    {
+        return $this->apiKey;
+    }
+
+    public function setType($type)
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    public function getType()
+    {
+        $this->type;
     }
 }
